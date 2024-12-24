@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        #game-container {
+            position: relative;
+            width: 600px;
+            height: 400px;
+            background-color: #ffffff;
+            border: 2px solid #000;
+        }
+
+        #warehouse {
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            width: 200px;
+            height: 300px;
+            border: 2px dashed #000;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            padding: 10px;
+        }
+
+        #warehouse-title {
+            position: absolute;
+            top: 10px;
+            left: 50px;
+            width: 200px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .box {
+            width: 40px;
+            height: 40px;
+            background-color: #007bff;
+            margin: 5px;
+            cursor: grab;
+            position: relative;
+        }
+
+        #lorry {
+            position: absolute;
+            top: 150px;
+            right: 50px;
+            width: 100px;
+            height: 100px;
+            border: 2px solid #000;
+        }
+
+        #lorry-title {
+            position: absolute;
+            top: 260px;
+            right: 50px;
+            width: 100px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        #purse {
+            position: absolute;
+            top: 10px;
+            right: 50px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .text {
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="warehouse">
+            <div class="box"></div>
+            <div class="box"></div>
+            <div class="box"></div>
+            <div class="box"></div>
+            <div class="box"></div>
+        </div>
+        <div id="warehouse-title">Hamid's Head Office Warehouse</div>
+        <div id="lorry">
+            <div class="text">Lorry</div>
+        </div>
+        <div id="lorry-title">Hamid's Truck No 1</div>
+        <div id="purse">Purse: 0 🪙 Lidoma Coins</div>
+    </div>
+
+    <script>
+        let draggedBox = null;
+        let offsetX = 0;
+        let offsetY = 0;
+        let purseValue = 0;
+
+        const purseDisplay = document.getElementById('purse');
+
+        document.querySelectorAll('.box').forEach(box => {
+            box.addEventListener('pointerdown', (e) => {
+                draggedBox = box;
+                offsetX = e.offsetX;
+                offsetY = e.offsetY;
+                box.style.position = 'absolute';
+                box.style.zIndex = '1000';
+                box.setPointerCapture(e.pointerId);
+            });
+
+            box.addEventListener('pointermove', (e) => {
+                if (draggedBox) {
+                    draggedBox.style.left = e.pageX - offsetX + 'px';
+                    draggedBox.style.top = e.pageY - offsetY + 'px';
+                }
+            });
+
+            box.addEventListener('pointerup', (e) => {
+                if (draggedBox) {
+                    const lorry = document.getElementById('lorry');
+                    const lorryRect = lorry.getBoundingClientRect();
+                    const boxRect = draggedBox.getBoundingClientRect();
+
+                    if (
+                        boxRect.left >= lorryRect.left &&
+                        boxRect.right <= lorryRect.right &&
+                        boxRect.top >= lorryRect.top &&
+                        boxRect.bottom <= lorryRect.bottom
+                    ) {
+                        draggedBox.style.display = 'none';
+                        purseValue++;
+                        purseDisplay.textContent = `Purse: ${purseValue} 🪙 Lidoma Coins`;
+                        alert('You loaded a Box, a Lidoma Coin is added to your purse!');
+                    } else {
+                        draggedBox.style.left = '';
+                        draggedBox.style.top = '';
+                        draggedBox.style.position = 'relative';
+                    }
+
+                    draggedBox.style.zIndex = '';
+                    draggedBox.releasePointerCapture(e.pointerId);
+                    draggedBox = null;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
